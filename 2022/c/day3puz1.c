@@ -6,7 +6,7 @@ int main(){
     char line[50],common;
     int len1,len2,sum=0;
 
-    input = fopen("day3inp.txt", "r");
+    input = fopen("2022/inputs/day3inp.txt", "r");
 
     while(fgets(line,50,input) != NULL){
         len1 = strlen(line)/2;

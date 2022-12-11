@@ -5,7 +5,7 @@ int main(){
     FILE *input;
     char opp,resp;
     int score=0;
-    input = fopen("day2inp.txt","r");
+    input = fopen("2022/inputs/day2inp.txt","r");
 
     while(fscanf(input,"%c %c\n",&opp,&resp) > 0){
         score += (resp=='X')?1:((resp=='Y')?2:3);

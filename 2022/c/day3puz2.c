@@ -24,7 +24,7 @@ int main(){
     char sacks[3][50];
     int sum=0,ctr=0;;
 
-    input = fopen("day3inp.txt", "r");
+    input = fopen("2022/inputs/day3inp.txt", "r");
 
     while(fgets(line,50,input) != NULL){
         strcpy(sacks[ctr],line);
