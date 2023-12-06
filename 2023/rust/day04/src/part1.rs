@@ -16,7 +16,7 @@ pub fn solve(input: String) -> u32 {
             }
         }
         if res > 0 {
-            sum += 2u32.pow(res-1);
+            sum += 2u32.pow(res - 1);
         }
     }
     sum

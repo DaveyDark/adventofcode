@@ -14,7 +14,10 @@ pub fn solve(input: String) -> u64 {
         if first_digit.is_none() || second_digit.is_none() {
             panic!("Invalid Input")
         }
-        sum += vec![first_digit.unwrap(), second_digit.unwrap()].concat().parse::<u64>().unwrap();
+        sum += vec![first_digit.unwrap(), second_digit.unwrap()]
+            .concat()
+            .parse::<u64>()
+            .unwrap();
     }
     sum
 }
