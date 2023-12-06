@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 
 pub fn solve(input: String) -> u32 {
     let mut sum = 0;
@@ -19,7 +19,7 @@ pub fn solve(input: String) -> u32 {
             }
         }
         for i in 1..=res {
-            *counts.entry(id+i).or_insert(0) += cnt;
+            *counts.entry(id + i).or_insert(0) += cnt;
         }
         sum += cnt;
         id += 1;
