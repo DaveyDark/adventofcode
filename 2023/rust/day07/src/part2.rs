@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 fn get_type(hand: &str) -> usize {
     let mut freq = HashMap::new();
-    hand.chars().for_each(|ch| *freq.entry(ch).or_insert(0) += 1);
+    hand.chars()
+        .for_each(|ch| *freq.entry(ch).or_insert(0) += 1);
     let mut joker = 0;
     if let Some(j) = freq.get_mut(&'J') {
         if *j != 5 {
@@ -10,10 +11,18 @@ fn get_type(hand: &str) -> usize {
             *j = 0;
         }
     }
-    let mut freq_str = freq.values().cloned().filter(|&f| f != 0).collect::<Vec<i32>>();
-    freq_str.sort_by(|a,b| b.cmp(a));
+    let mut freq_str = freq
+        .values()
+        .cloned()
+        .filter(|&f| f != 0)
+        .collect::<Vec<i32>>();
+    freq_str.sort_by(|a, b| b.cmp(a));
     freq_str[0] += joker;
-    let freq_str = freq_str.iter().map(|f| f.to_string()).collect::<Vec<String>>().concat();
+    let freq_str = freq_str
+        .iter()
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>()
+        .concat();
     match freq_str.as_str() {
         "5" => 0,
         "41" => 1,
@@ -71,7 +80,7 @@ pub fn solve(input: String) -> u64 {
     let mut sum = 0;
     let mut rank = 1;
     for hand_type in hands.iter_mut().rev() {
-        hand_type.sort_by(|a,b| compare_hand(&b.0, &a.0));
+        hand_type.sort_by(|a, b| compare_hand(&b.0, &a.0));
         for hand in hand_type.iter().rev() {
             sum += hand.1 * rank;
             rank += 1;
