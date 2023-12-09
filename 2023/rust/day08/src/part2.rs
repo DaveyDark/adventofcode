@@ -1,6 +1,19 @@
-use std::collections::HashMap;
 use regex::Regex;
-use rayon::prelude::*;
+use std::collections::HashMap;
+
+fn lcm(a: u64, b: u64) -> u64 {
+    a * b / gcd(a, b)
+}
+fn gcd(a: u64, b: u64) -> u64 {
+    let mut a = a;
+    let mut b = b;
+    while b != 0 {
+        let t = b;
+        b = a % b;
+        a = t;
+    }
+    a
+}
 
 pub fn solve(input: String) -> u64 {
     let mut lines_iter = input.lines();
@@ -12,20 +25,30 @@ pub fn solve(input: String) -> u64 {
         let key = captures[1].to_owned();
         let l = captures[2].to_owned();
         let r = captures[3].to_owned();
-        map.insert(key, (l,r));
+        map.insert(key, (l, r));
     }
-    let mut curr = map.keys().filter(|k| k.ends_with('A')).collect::<Vec<&String>>();
-    let mut dist = 0;
-    for ch in path.chars().cycle() {
-        if curr.iter().all(|c| c.ends_with('Z')) {break}
+    let curr = map
+        .keys()
+        .filter(|k| k.ends_with('A'))
+        .collect::<Vec<&String>>();
+    let mut dist = vec![];
+    for c in curr.iter() {
+        let mut cur = *c;
+        let mut steps = 0;
+        for ch in path.chars().cycle() {
+            if cur.ends_with('Z') {
+                break;
+            }
 
-        match ch {
-            'L' => curr.par_iter_mut().for_each(|c| *c = &map.get(*c).unwrap().0),
-            'R' => curr.par_iter_mut().for_each(|c| *c = &map.get(*c).unwrap().1),
-            _ => panic!(),
+            match ch {
+                'L' => cur = &map.get(cur).unwrap().0,
+                'R' => cur = &map.get(cur).unwrap().1,
+                _ => panic!(),
+            }
+
+            steps += 1;
         }
-
-        dist += 1;
+        dist.push(steps);
     }
-    dist
+    dist.windows(2).fold(dist[0], |acc, x| lcm(acc, x[1]))
 }
