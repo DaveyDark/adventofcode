@@ -16,8 +16,8 @@ fn main() {
         Ok(data) => println!("Part 2: sample result: {}", part2::solve(data)),
         Err(e) => println!("Error reading sample input for part 2: {}", e),
     }
-    // match fs::read_to_string("input/input.txt") {
-    //     Ok(data) => println!("Part 2: input result: {}", part2::solve(data)),
-    //     Err(e) => println!("Error reading actual input for part 2: {}", e),
-    // }
+    match fs::read_to_string("input/input.txt") {
+        Ok(data) => println!("Part 2: input result: {}", part2::solve(data)),
+        Err(e) => println!("Error reading actual input for part 2: {}", e),
+    }
 }

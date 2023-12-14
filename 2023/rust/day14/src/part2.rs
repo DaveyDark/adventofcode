@@ -61,12 +61,32 @@ fn calculate_weights(grid: &Vec<Vec<char>>) -> u64 {
     weights
 }
 
+fn get_cycle_length(memo: HashMap<Vec<Vec<char>>, Vec<Vec<char>>>, start: &Vec<Vec<char>>) -> u64 {
+    let mut ptr = start.clone();
+    let mut l = 0;
+    loop {
+        ptr = memo.get(&ptr).unwrap().clone();
+        l += 1;
+        if ptr == *start {
+            break;
+        }
+    }
+    l
+}
+
 pub fn solve(input: String) -> u64 {
     let mut grid: Vec<Vec<char>> = input.lines().map(|l| l.chars().collect()).collect();
     let mut memo: HashMap<Vec<Vec<char>>, Vec<Vec<char>>> = HashMap::new();
-    for _ in 0..1_000_000_000 {
+    let mut l = None;
+    for i in 0..1_000_000_000 {
         if let Some(g) = memo.get(&grid) {
             grid = g.clone();
+            if l.is_none() {
+                l = Some(get_cycle_length(memo.clone(), &grid));
+            }
+            if (1_000_000_000 - (i + 1)) % l.unwrap() == 0 {
+                break;
+            }
         } else {
             let new_grid = spin_grid(&grid);
             memo.insert(grid, new_grid.clone());
