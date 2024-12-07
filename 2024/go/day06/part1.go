@@ -13,17 +13,6 @@ func init() {
 	registry.Registry["day6/part1"] = solve
 }
 
-func cycleDirection(dir [2]int) [2]int {
-	newDir := [2]int{0, dir[0]}
-	if dir[0] == 0 {
-		newDir[0] = -dir[1]
-	} else {
-		newDir[0] = 1
-	}
-	newDir[1] = dir[0]
-	return newDir
-}
-
 func solve(inputFile string) (int64, error) {
 	// Read inputFile
 	file, err := os.Open(inputFile)
