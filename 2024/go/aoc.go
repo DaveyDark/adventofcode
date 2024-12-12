@@ -14,7 +14,9 @@ import (
 	_ "github.com/daveydark/adventofcode/2024/day07"
 	_ "github.com/daveydark/adventofcode/2024/day08"
 	_ "github.com/daveydark/adventofcode/2024/day09"
+	_ "github.com/daveydark/adventofcode/2024/day10"
 	_ "github.com/daveydark/adventofcode/2024/day11"
+	_ "github.com/daveydark/adventofcode/2024/day12"
 	"github.com/daveydark/adventofcode/2024/internal/registry"
 )
 
