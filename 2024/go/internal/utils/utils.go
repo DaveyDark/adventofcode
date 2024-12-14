@@ -3,6 +3,7 @@ package utils
 import (
 	"bufio"
 	"os"
+	"strconv"
 )
 
 func InGrid(grid [][]rune, pos [2]int) bool {
@@ -23,4 +24,18 @@ func ConstructGrid(inputFile string) ([][]rune, error) {
 	}
 
 	return grid, nil
+}
+
+func MapStrArrToInt(arr []string, start int, count int) ([]int, error) {
+	intArr := make([]int, count)
+	cnt := 0
+	for i := start; i < start+count; i++ {
+		num, err := strconv.Atoi(arr[i])
+		if err != nil {
+			return intArr, err
+		}
+		intArr[cnt] = num
+		cnt++
+	}
+	return intArr, nil
 }
