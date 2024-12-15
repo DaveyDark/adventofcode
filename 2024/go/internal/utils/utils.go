@@ -2,9 +2,13 @@ package utils
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"strconv"
+	"strings"
 )
+
+var Directions = [4][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
 
 func InGrid(grid [][]rune, pos [2]int) bool {
 	return pos[1] >= 0 && pos[1] < len(grid) && pos[0] >= 0 && pos[0] < len(grid[0])
@@ -15,7 +19,16 @@ func ConstructGrid(inputFile string) ([][]rune, error) {
 	if err != nil {
 		return nil, err
 	}
-	scanner := bufio.NewScanner(file)
+	return constructGridFromReader(file)
+}
+
+func ContructGridFromStr(input string) ([][]rune, error) {
+	reader := strings.NewReader(input)
+	return constructGridFromReader(reader)
+}
+
+func constructGridFromReader(reader io.Reader) ([][]rune, error) {
+	scanner := bufio.NewScanner(reader)
 
 	grid := [][]rune{}
 	for scanner.Scan() {
