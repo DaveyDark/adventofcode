@@ -1,9 +1,11 @@
 package day16
 
 import (
+	"fmt"
+
 	"github.com/daveydark/adventofcode/2024/internal/registry"
 	"github.com/daveydark/adventofcode/2024/internal/utils"
-	"github.com/emirpasic/gods/queues/arrayqueue"
+	"github.com/emirpasic/gods/queues/priorityqueue"
 	"github.com/emirpasic/gods/sets/hashset"
 )
 
@@ -41,78 +43,151 @@ func solve2(inputFile string) (int64, error) {
 	grid[source[0]][source[1]] = '.'
 	grid[dest[0]][dest[1]] = '.'
 
-	// Get distance
-	dist := calculateMinPath(grid, source, dest)
-
 	// Calculate paths
-	paths := calculatePaths(grid, source, dest, dist)
+	paths := calculatePaths(grid, source, dest)
 
 	return int64(paths), nil
 }
 
-func calculatePaths(grid [][]rune, source [2]int, dest [2]int, dist int) int {
-	// BFS to calculate number of paths, stop when max distance is reached
-	queue := arrayqueue.New()
-	visited := map[[2][2]int]int{}
-	queue.Enqueue(Crawler{source, [2]int{0, 1}, [][2]int{source}, 0})
-	successfulCrawlers := []Crawler{}
+func calculatePaths(grid [][]rune, source [2]int, destination [2]int) int {
+	// A* algorithm to find shortest path(s)
+	// Convert source and destination to Node
+	src := utils.Node{X: source[0], Y: source[1]}
+	dest := utils.Node{X: destination[0], Y: destination[1]}
 
+	// Create open and closed sets
+	nodes := map[utils.Node]*GraphMultiNode{} // All nodes
+	queue := priorityqueue.NewWith(func(n1, n2 interface{}) int {
+		a := nodes[n1.(utils.Node)]
+		b := nodes[n2.(utils.Node)]
+		diff := a.FCost - b.FCost
+		if diff == 0 {
+			return a.HCost - b.HCost
+		}
+		return diff
+	}) // Priority queue
+	visited := hashset.New() // Visited nodes
+
+	// Initialize
+	queue.Enqueue(src)
+	nodes[src] = NewGraphMultiNode(0, utils.ManhattenDistance(src, dest))
+
+	// Traverse the grid
 	for !queue.Empty() {
-		// Get node
-		node, _ := queue.Dequeue()
-		crawler := node.(Crawler)
-		visited[[2][2]int{crawler.position, crawler.direction}] = crawler.distance
+		_node, _ := queue.Dequeue()
+		node := _node.(utils.Node)
+		graphNode := nodes[node]
+		visited.Add(node)
 
-		// If we exceed max distance, stop
-		if crawler.distance > dist {
-			continue
-		}
-
-		// Check if we reached destination
-		if crawler.position == dest {
-			if crawler.distance == dist {
-				successfulCrawlers = append(successfulCrawlers, crawler)
+		fmt.Print(node)
+		if graphNode.Backrefs != nil {
+			for _, backref := range graphNode.Backrefs.Values() {
+				fmt.Print(" <- ", backref)
 			}
+		}
+		print(" | ")
+		if node == dest {
 			continue
 		}
 
-		// Check neighbors
-		for _, adj := range utils.Directions {
-			di := crawler.position[0] + adj[0]
-			dj := crawler.position[1] + adj[1]
+		// Explore neighbors
+		for _, dir := range utils.Directions {
+			nb := utils.Node{X: node.X + dir[0], Y: node.Y + dir[1]}
 
-			visitDist, isVisited := visited[[2][2]int{{di, dj}, adj}]
-
-			if grid[di][dj] != '.' || (isVisited && visitDist <= crawler.distance) {
-				// if neighbor is not a valid cell or has been visited, continue
+			// If node is invalid, skip
+			if nb.Invalid(len(grid), len(grid[0])) || grid[nb.X][nb.Y] != '.' {
 				continue
 			}
 
-			// Create new crawler
-			newCrawler := Crawler{[2]int{di, dj}, adj, [][2]int{}, crawler.distance + 1}
-			// Copy path into newCrawler
-			newCrawler.path = append(newCrawler.path, crawler.path...)
-
-			// Check if we changed direction
-			if adj != crawler.direction {
-				if adj[0]+crawler.direction[0] == 0 && adj[1]+crawler.direction[1] == 0 {
-					newCrawler.distance += 2000
-				} else {
-					newCrawler.distance += 1000
-				}
+			cost := graphNode.GCost + 1
+			// Project current direction backwards to find expected last position
+			lastPos := utils.Node{X: node.X - dir[0], Y: node.Y - dir[1]}
+			// Check if last position is a backref
+			if !graphNode.Backrefs.Contains(lastPos) {
+				// Change of direction, increase cost
+				cost += 1000
 			}
-			newCrawler.path = append(newCrawler.path, [2]int{di, dj})
-			queue.Enqueue(newCrawler)
+
+			fmt.Print(nb, cost)
+
+			nbNode, ok := nodes[nb]
+			if ok {
+				fmt.Print(" O ", nbNode.GCost, graphNode.GCost)
+			}
+			if !ok {
+				fmt.Print(" N ")
+				nbNode = NewGraphMultiNode(cost, utils.ManhattenDistance(nb, dest))
+				// Add to backrefs
+				nbNode.Backrefs = hashset.New()
+				nbNode.Backrefs.Add(node)
+			} else if nbNode.GCost > cost {
+				fmt.Print(" H ", nb)
+				// Update old node with new Cost
+				nbNode.UpdateGCost(cost + 1)
+				// Replace backrefs with new hashset
+				nbNode.Backrefs = hashset.New()
+				nbNode.Backrefs.Add(node)
+			} else if nbNode.GCost == cost {
+				fmt.Print(" E ")
+				// Equal cost, add to backrefs
+				nbNode.Backrefs.Add(node)
+			} else {
+				continue
+			}
+			if visited.Contains(nb) {
+				continue
+			}
+			nodes[nb] = nbNode
+
+			// Add node for further processing
+			queue.Enqueue(nb)
+		}
+		println()
+	}
+
+	path := constructPath(dest, nodes)
+
+	// Print paths on grid
+	for i, row := range grid {
+		for j, cell := range row {
+			if path.Contains(utils.Node{X: i, Y: j}) {
+				fmt.Print("O")
+			} else {
+				fmt.Print(string(cell))
+			}
+		}
+		println()
+	}
+
+	return path.Size()
+}
+
+func constructPath(node utils.Node, nodes map[utils.Node]*GraphMultiNode) *hashset.Set {
+	path := hashset.New()
+	stack := []utils.Node{node}
+
+	for len(stack) > 0 {
+		current := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+
+		if path.Contains(current) {
+			continue
+		}
+
+		path.Add(current)
+		for _, backref := range nodes[current].Backrefs.Values() {
+			stack = append(stack, backref.(utils.Node))
 		}
 	}
 
-	// Count number of paths
-	pathSet := hashset.New()
-	for _, crawler := range successfulCrawlers {
-		for _, path := range crawler.path {
-			pathSet.Add(path)
-		}
-	}
+	return path
+}
 
-	return pathSet.Size()
+type GraphMultiNode struct {
+	utils.GraphNode
+	Backrefs *hashset.Set
+}
+
+func NewGraphMultiNode(gCost, fCost int) *GraphMultiNode {
+	return &GraphMultiNode{*utils.NewGraphNode(gCost, fCost), hashset.New()}
 }
