@@ -19,6 +19,10 @@ type Node struct {
 	Y int
 }
 
+func NewNode(x, y int) Node {
+	return Node{x, y}
+}
+
 func (this Node) Invalid(rows, cols int) bool {
 	return this.X < 0 || this.Y < 0 || this.X == rows || this.Y == cols
 }
