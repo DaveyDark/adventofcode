@@ -27,6 +27,7 @@ import (
 	_ "github.com/daveydark/adventofcode/2024/day20"
 	_ "github.com/daveydark/adventofcode/2024/day21"
 	_ "github.com/daveydark/adventofcode/2024/day22"
+	_ "github.com/daveydark/adventofcode/2024/day23"
 	"github.com/daveydark/adventofcode/2024/internal/registry"
 )
 
