@@ -1,6 +1,8 @@
 const std = @import("std");
 const ArrayList = std.ArrayList;
 
+const BUFFER_SIZE = 10;
+
 // Day 2: Gift Shop
 pub fn run(alloc: std.mem.Allocator) !void {
     std.debug.print("Day 2\n", .{});
@@ -12,7 +14,7 @@ pub fn run(alloc: std.mem.Allocator) !void {
 
 // For Part 1, Check if the ID is invalid
 // If a string is a substring repeated twice, it is invalid
-fn is_invalid(id: u64, str_buf: *[10]u8) !bool {
+fn is_invalid(id: u64, str_buf: *[BUFFER_SIZE]u8) !bool {
     var size: usize = 0;
 
     // Format the ID into a string
@@ -34,7 +36,7 @@ fn is_invalid(id: u64, str_buf: *[10]u8) !bool {
 fn task1(_: std.mem.Allocator, input: []const u8) !u64 {
     var rangeIter = std.mem.tokenizeAny(u8, input, ",");
     var ans: u64 = 0;
-    var str_buf: [10]u8 = undefined;
+    var str_buf: [BUFFER_SIZE]u8 = undefined;
 
     // Parse comma-separated ranges from input (format: "start1-end1,start2-end2,...")
     while(rangeIter.next()) |range| {
@@ -58,7 +60,7 @@ fn task1(_: std.mem.Allocator, input: []const u8) !u64 {
 
 // For Part 2, Check if the ID is invalid
 // If a string is a substring repeated ANY NUMBER OF TIMES, it is invalid
-fn is_invalid2(id: u64, str_buf: *[10]u8) !bool {
+fn is_invalid2(id: u64, str_buf: *[BUFFER_SIZE]u8) !bool {
     var size: usize = 0;
 
     // Convert ID to string representation and store in source buffer
@@ -101,7 +103,7 @@ fn is_invalid2(id: u64, str_buf: *[10]u8) !bool {
 fn task2(_: std.mem.Allocator, input: []const u8) !u64 {
     var rangeIter = std.mem.tokenizeAny(u8, input, ",");
     var ans: u64 = 0;
-    var str_buf: [10]u8 = undefined;
+    var str_buf: [BUFFER_SIZE]u8 = undefined;
 
     // Parse ranges from input
     while(rangeIter.next()) |range| {
