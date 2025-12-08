@@ -3,7 +3,7 @@ const ArrayList = std.ArrayList;
 const Grid = @import("common/grid.zig").Grid;
 
 pub fn run(alloc: std.mem.Allocator) !void {
-    std.debug.print("Day 2\n", .{});
+    std.debug.print("Day 4\n", .{});
     const part1 = try task1(alloc, comptime @embedFile("inputs/day4_input.txt"));
     std.debug.print("Part 1: {d}\n", .{part1});
     const part2 = try task2(alloc, comptime @embedFile("inputs/day4_input.txt"));

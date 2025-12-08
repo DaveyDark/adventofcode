@@ -84,3 +84,90 @@ pub fn Grid(comptime T: type) type {
         }
     };
 }
+
+test "Grid basic operations" {
+    const allocator = std.testing.allocator;
+
+    // Test with i32 type
+    const buf = try allocator.alloc(i32, 6);
+    defer allocator.free(buf);
+
+    var grid = Grid(i32).new(buf, 2, 3);
+
+    // Test set and get
+    grid.set(0, 0, 1);
+    grid.set(0, 1, 2);
+    grid.set(0, 2, 3);
+    grid.set(1, 0, 4);
+    grid.set(1, 1, 5);
+    grid.set(1, 2, 6);
+
+    try std.testing.expect(grid.get(0, 0) == 1);
+    try std.testing.expect(grid.get(0, 1) == 2);
+    try std.testing.expect(grid.get(0, 2) == 3);
+    try std.testing.expect(grid.get(1, 0) == 4);
+    try std.testing.expect(grid.get(1, 1) == 5);
+    try std.testing.expect(grid.get(1, 2) == 6);
+}
+
+test "Grid isOob" {
+    const allocator = std.testing.allocator;
+
+    const buf = try allocator.alloc(u8, 4);
+    defer allocator.free(buf);
+
+    const grid = Grid(u8).new(buf, 2, 2);
+
+    // Test valid positions
+    try std.testing.expect(!grid.isOob(0, 0));
+    try std.testing.expect(!grid.isOob(0, 1));
+    try std.testing.expect(!grid.isOob(1, 0));
+    try std.testing.expect(!grid.isOob(1, 1));
+
+    // Test out of bounds positions
+    try std.testing.expect(grid.isOob(-1, 0));
+    try std.testing.expect(grid.isOob(0, -1));
+    try std.testing.expect(grid.isOob(2, 0));
+    try std.testing.expect(grid.isOob(0, 2));
+    try std.testing.expect(grid.isOob(2, 2));
+}
+
+test "Grid newFromInput" {
+    const allocator = std.testing.allocator;
+
+    const input = "abc\ndef";
+    var grid = try Grid(u8).newFromInput(allocator, input, null);
+    defer grid.deinit(allocator);
+
+    try std.testing.expect(grid.rows == 2);
+    try std.testing.expect(grid.cols == 3);
+    try std.testing.expect(grid.get(0, 0) == 'a');
+    try std.testing.expect(grid.get(0, 1) == 'b');
+    try std.testing.expect(grid.get(0, 2) == 'c');
+    try std.testing.expect(grid.get(1, 0) == 'd');
+    try std.testing.expect(grid.get(1, 1) == 'e');
+    try std.testing.expect(grid.get(1, 2) == 'f');
+}
+
+test "Grid newFromInput with conversion function" {
+    const allocator = std.testing.allocator;
+
+    const conv_fn = struct {
+        fn convert(c: u8) i32 {
+            return @as(i32, c) - '0';
+        }
+    }.convert;
+
+    const input = "123\n456";
+    var grid = try Grid(i32).newFromInput(allocator, input, conv_fn);
+    defer grid.deinit(allocator);
+
+    try std.testing.expect(grid.rows == 2);
+    try std.testing.expect(grid.cols == 3);
+    try std.testing.expect(grid.get(0, 0) == 1);
+    try std.testing.expect(grid.get(0, 1) == 2);
+    try std.testing.expect(grid.get(0, 2) == 3);
+    try std.testing.expect(grid.get(1, 0) == 4);
+    try std.testing.expect(grid.get(1, 1) == 5);
+    try std.testing.expect(grid.get(1, 2) == 6);
+}
