@@ -29,7 +29,7 @@ fn is_invalid(id: u64, str_buf: *[BUFFER_SIZE]u8) !bool {
     if (size % 2 != 0) return false;
 
     // Checl if left and right halves are equal
-    return std.mem.eql(u8, str_buf[0..size/2], str_buf[size/2..size]);
+    return std.mem.eql(u8, str_buf[0 .. size / 2], str_buf[size / 2 .. size]);
 }
 
 // Part 1: Sum all invalid IDs within given ranges
@@ -39,7 +39,7 @@ fn task1(_: std.mem.Allocator, input: []const u8) !u64 {
     var str_buf: [BUFFER_SIZE]u8 = undefined;
 
     // Parse comma-separated ranges from input (format: "start1-end1,start2-end2,...")
-    while(rangeIter.next()) |range| {
+    while (rangeIter.next()) |range| {
         // Split each range on hyphen to get start and end values
         var splitIter = std.mem.tokenizeAny(u8, range, "-");
         const start = try std.fmt.parseInt(u64, splitIter.next().?, 10);
@@ -49,7 +49,7 @@ fn task1(_: std.mem.Allocator, input: []const u8) !u64 {
         var n = start;
         while (n <= end) : (n += 1) {
             // If the ID is invalid (meets our criteria), add it to the sum
-            if(try is_invalid(n, &str_buf)) {
+            if (try is_invalid(n, &str_buf)) {
                 ans += n;
             }
         }
@@ -77,7 +77,7 @@ fn is_invalid2(id: u64, str_buf: *[BUFFER_SIZE]u8) !bool {
 
     while (left_length >= right_length) {
         // If substrings are not divisible
-        if(left_length % right_length != 0) {
+        if (left_length % right_length != 0) {
             right_length += 1;
             left_length = size - right_length;
             continue;
@@ -86,10 +86,9 @@ fn is_invalid2(id: u64, str_buf: *[BUFFER_SIZE]u8) !bool {
         const repeats = @max(left_length / right_length, 1);
 
         // Check if substring is repeated expected number of times
-        if(std.mem.containsAtLeast(u8, str_buf[0..left_length], repeats, str_buf[left_length..size])) {
+        if (std.mem.containsAtLeast(u8, str_buf[0..left_length], repeats, str_buf[left_length..size])) {
             return true;
         }
-
 
         // Update right_length and left_length
         right_length += 1;
@@ -106,7 +105,7 @@ fn task2(_: std.mem.Allocator, input: []const u8) !u64 {
     var str_buf: [BUFFER_SIZE]u8 = undefined;
 
     // Parse ranges from input
-    while(rangeIter.next()) |range| {
+    while (rangeIter.next()) |range| {
         var splitIter = std.mem.tokenizeAny(u8, range, "-");
         const start = try std.fmt.parseInt(u64, splitIter.next().?, 10);
         const end = try std.fmt.parseInt(u64, splitIter.next().?, 10);
@@ -114,7 +113,7 @@ fn task2(_: std.mem.Allocator, input: []const u8) !u64 {
         // Loop over the range of IDs
         var n = start;
         while (n <= end) : (n += 1) {
-            if(try is_invalid2(n, &str_buf)) {
+            if (try is_invalid2(n, &str_buf)) {
                 ans += n;
             }
         }
