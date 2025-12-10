@@ -8,4 +8,5 @@ test "import all src" {
     _ = @import("day05.zig");
     _ = @import("day06.zig");
     _ = @import("day07.zig");
+    _ = @import("day08.zig");
 }
