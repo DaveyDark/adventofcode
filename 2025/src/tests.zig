@@ -11,4 +11,5 @@ test "import all src" {
     _ = @import("day08.zig");
     _ = @import("day09.zig");
     _ = @import("day10.zig");
+    _ = @import("day11.zig");
 }
