@@ -1,6 +1,7 @@
 <span>
 <img src="./.assets/christmas_ferris.png" width="164">
 <img src="./.assets/christmas_gofer.png" width="164">
+<img src="./.assets/zig.png" width="164">
 </span>
 
 # 🎄 Advent of Code
